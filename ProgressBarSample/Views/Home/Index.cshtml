@@ -13,43 +13,54 @@
 </div>
 
 
-<input type="button" value="Start" class="btn btn-lg btn-primary" onclick="startOperation()" />
+<input type="button" value="Start" class="btn btn-lg btn-primary" onclick="startDBOperation()" />
 
 
 <script type="text/javascript">
-    function startOperation() {
-        $('.progress').show();
 
-        var val = 0;
+    function startDBOperation() {
+       
+        // ajax request started
+        $.post('/home/StartSomeDbOperation', { }, function (response) {
+            if (response.status == true) {
+                startGettingProgress();
+                setPercetValue(response.percentCompleted);
+            }
+        });
+    }
+
+
+    function startGettingProgress() {
+
+        $('.progress').show();
 
         var intrVl = setInterval(function () {
 
             // ajax request started
-            $.post('/home/GetProgressStatus', { time : val }, function (response) {
-
-                val = response.value;
+            $.post('/home/GetProgressStatus', {  }, function (response) {
 
                 // Code to stop interval
-                if (val === 100) {
-                    clearInterval(intrVl);
+               if (response.percentCompleted >= 100) {
+                   clearInterval(intrVl);
+                   $('.progress').hide();
+                   setPercetValue(0);
                 }
 
-                var _widthPercent = val + '%';
-
                 // Set progressbar width percent
-                setPercetValue(_widthPercent);
+               setPercetValue(response.percentCompleted);
 
-            });           
+            });
 
         }, 1000);   // Called after every one second
-
-        
     }
 
 
-    function setPercetValue(widthPercent) {
-        $('.progress-bar').width(widthPercent);
-        $('.sr-only').text(widthPercent + ' Complete');
+    function setPercetValue(val) {
+
+        var _widthPercent = val + '%';
+
+        $('.progress-bar').width(_widthPercent);
+        $('.sr-only').html(_widthPercent + ' Complete');
     }
 
 </script>
