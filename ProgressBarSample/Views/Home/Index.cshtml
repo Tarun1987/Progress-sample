@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "Progress sample";
+}
+
+<h2>Progress bar sample</h2>
+
+<div class="progress" style="display:none">
+    <div class="progress-bar" role="progressbar" aria-valuenow="70"
+         aria-valuemin="0" aria-valuemax="100" style="width:0%">
+        <span class="sr-only">70% Complete</span>
+    </div>
+</div>
+
+
+<input type="button" value="Start" class="btn btn-lg btn-primary" onclick="startOperation()" />
+
+
+<script type="text/javascript">
+    function startOperation() {
+        $('.progress').show();
+
+        var val = 0;
+
+        var intrVl = setInterval(function () {
+
+            // ajax request started
+            $.post('/home/GetProgressStatus', { time : val }, function (response) {
+
+                val = response.value;
+
+                // Code to stop interval
+                if (val === 100) {
+                    clearInterval(intrVl);
+                }
+
+                var _widthPercent = val + '%';
+
+                // Set progressbar width percent
+                setPercetValue(_widthPercent);
+
+            });           
+
+        }, 1000);   // Called after every one second
+
+        
+    }
+
+
+    function setPercetValue(widthPercent) {
+        $('.progress-bar').width(widthPercent);
+        $('.sr-only').text(widthPercent + ' Complete');
+    }
+
+</script>
+
